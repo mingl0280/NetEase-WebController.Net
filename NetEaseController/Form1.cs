@@ -20,13 +20,6 @@ namespace NetEaseController
 {
     public partial class Form1 : Form
     {
-
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern long FindWindow(string lpClassName, string lpWindowName);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool GetWindowText(int hWnd, StringBuilder title, int maxBufSize);
-
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
@@ -44,6 +37,9 @@ namespace NetEaseController
             LoadCommandKeySeettings();
         }
 
+        /// <summary>
+        /// 载入快捷键设定
+        /// </summary>
         private void LoadCommandKeySeettings()
         {
             foreach (SettingsProperty SettingProp in Properties.CommandSetting.Default.Properties)
@@ -62,6 +58,11 @@ namespace NetEaseController
             }
         }
 
+        /// <summary>
+        /// 修正虚拟键映射问题
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         private string GetProperVKString(string input)
         {
             if (input.StartsWith("F") && (input.Length == 2))
@@ -79,6 +80,9 @@ namespace NetEaseController
             }
         }
 
+        /// <summary>
+        /// 音乐标题更新线程
+        /// </summary>
         private void MusicTitleUpdater()
         {
             while (ProcRunning)
@@ -119,6 +123,11 @@ namespace NetEaseController
             }
         }
 
+        /// <summary>
+        /// 写日志
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="severity"></param>
         private void AddToTextLog(string text, string severity)
         {
             textBox1.AppendText(string.Format("[{0} {1}][{2}]{3}\r\n", new string[]{
@@ -128,6 +137,9 @@ namespace NetEaseController
                 text}));
         }
 
+        /// <summary>
+        /// Web服务器线程
+        /// </summary>
         private void ControlListener()
         {
             using (HttpListener hListener = new HttpListener())
@@ -186,6 +198,11 @@ namespace NetEaseController
             }
         }
 
+        /// <summary>
+        /// 发送文件
+        /// </summary>
+        /// <param name="RealFilePath">文件目录</param>
+        /// <param name="hContext">Web请求上下文</param>
         private void SendResponse(string RealFilePath, ref HttpListenerContext hContext)
         {
             FileInfo fi = new FileInfo(RealFilePath);
@@ -200,6 +217,12 @@ namespace NetEaseController
             }
             hContext.Response.Close();
         }
+        
+        /// <summary>
+        /// 发送少量文本
+        /// </summary>
+        /// <param name="TextContent">文本内容</param>
+        /// <param name="hContext">Web请求上下文</param>
         private void SendPlainTextResponse(string TextContent, ref HttpListenerContext hContext)
         {
             hContext.Response.ContentType = "text/text";
@@ -211,7 +234,11 @@ namespace NetEaseController
             hContext.Response.Close();
         }
 
-
+        /// <summary>
+        /// 线程初始化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
             MusicTitleThread = new Thread(new ThreadStart(MusicTitleUpdater));
@@ -220,24 +247,32 @@ namespace NetEaseController
             ControllerListenerThread.Start();
         }
 
-        ~Form1()
-        {
-            ProcRunning = false;
-            MusicTitleThread.Abort();
-            ControllerListenerThread.Abort();
-        }
-
-        private void PageInitializer()
-        {
-
-        }
-
+        /// <summary>
+        /// 翻译命令到快捷键并执行
+        /// </summary>
+        /// <param name="Command">目标命令</param>
         private void ExecuteNECommand(string Command)
         {
             List<VirtualKeyCode> vks = new List<VirtualKeyCode>(CommandDict[Command]);
             PressCommandKeys(vks);
         }
 
+        /// <summary>
+        /// 线程销毁
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            ProcRunning = false;
+            MusicTitleThread.Abort();
+            ControllerListenerThread.Abort();
+        }
+
+        /// <summary>
+        /// 执行快捷键
+        /// </summary>
+        /// <param name="vks"></param>
         private void PressCommandKeys(List<VirtualKeyCode> vks)
         {
             if (vks.Count == 1)
