@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NetEaseController" GeneratedClassName="CommandSetting">
+  <Profiles />
+  <Settings>
+    <Setting Name="PlayPause" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+F1</Value>
+    </Setting>
+    <Setting Name="PrevSong" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+F2</Value>
+    </Setting>
+    <Setting Name="NextSong" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+F3</Value>
+    </Setting>
+    <Setting Name="VolUp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+F4</Value>
+    </Setting>
+    <Setting Name="VolDown" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+F5</Value>
+    </Setting>
+    <Setting Name="LikeMusic" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Ctrl+F8</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
