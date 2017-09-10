@@ -130,6 +130,13 @@ namespace NetEaseController
         /// <param name="severity"></param>
         private void AddToTextLog(string text, string severity)
         {
+            if (textBox1.Lines.Length > 200)
+            {
+                var tList = textBox1.Lines.ToList();
+                tList.RemoveRange(CommandDict.Count - 1, 150+CommandDict.Count);
+                textBox1.Lines = tList.ToArray();
+            }
+
             textBox1.AppendText(string.Format("[{0} {1}][{2}]{3}\r\n", new string[]{
                 DateTime.Now.ToLongDateString(),
                 DateTime.Now.ToLongTimeString(),
@@ -155,8 +162,12 @@ namespace NetEaseController
                     {
                         hContext.Response.StatusCode = 200;
                         hContext.Response.ContentEncoding = Encoding.UTF8;
+                        BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { string.Format("{0}:{1} Query to {2} Succeed. 200.",
+                            new string[] {
+                                hContext.Request.RemoteEndPoint.Address.ToString(),
+                                hContext.Request.RemoteEndPoint.Port.ToString(),
+                                hContext.Request.RawUrl })  , "Info" });
                         SendResponse("./html/index.htm", ref hContext);
-                        BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
                     }
                     else
                     {
@@ -168,15 +179,15 @@ namespace NetEaseController
                                 hContext.Response.StatusCode = 400;
                                 hContext.Response.ContentEncoding = Encoding.UTF8;
                                 decodedPathString = "./error/404.htm";
-                                SendResponse(decodedPathString, ref hContext);
                                 BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Failed. 404.", "Error" });
+                                SendResponse(decodedPathString, ref hContext);
                             }
                             else
                             {
                                 hContext.Response.StatusCode = 200;
                                 hContext.Response.ContentEncoding = Encoding.UTF8;
-                                SendResponse(decodedPathString, ref hContext);
                                 BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
+                                SendResponse(decodedPathString, ref hContext);
                             }
                         }
                         else
@@ -184,14 +195,15 @@ namespace NetEaseController
                             string opString = new StreamReader(hContext.Request.InputStream).ReadToEnd();
                             if (opString == "Status")
                             {
-                                SendPlainTextResponse(@"正在播放: " + MusicTitleString, ref hContext);
                                 BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
+                                SendPlainTextResponse(@"正在播放: " + MusicTitleString, ref hContext);
                             }
                             else
                             {
                                 ExecuteNECommand(opString);
                                 BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
-                            } 
+                                SendPlainTextResponse("OK", ref hContext);
+                            }
                         }
                     }
                 }
@@ -217,7 +229,7 @@ namespace NetEaseController
             }
             hContext.Response.Close();
         }
-        
+
         /// <summary>
         /// 发送少量文本
         /// </summary>
