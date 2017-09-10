@@ -108,7 +108,7 @@ namespace NetEaseController
                         {
                             var CNText = new StringBuilder("", 2053);
                             GetClassName(proc.MainWindowHandle, CNText, 2050);
-                            if (CNText.ToString().Trim() != "")
+                            if (CNText.ToString().Trim() != "" && CNText.ToString() != "DesktopLyrics")
                             {
                                 NEPid = proc.Id;
                             }
