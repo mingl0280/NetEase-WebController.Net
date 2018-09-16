@@ -1,10 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace NetEaseController
 {
     class MIMEMaps
     {
+
         private static IDictionary<string, string> _mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
 
         #region Big freaking list of mime types
@@ -574,6 +576,28 @@ namespace NetEaseController
         #endregion
 
         };
+
+        public MIMEMaps()
+        {
+
+        }
+
+        private void CheckExternalMIMEMaps()
+        {
+            if (File.Exists(@"AddonMIME.cfg"))
+            {
+                using (StreamReader sr = new StreamReader("AddonMIME.cfg"))
+                {
+                    while(!sr.EndOfStream)
+                    {
+                        var LineText = sr.ReadLine();
+                        string[] SplitedLineText = LineText.Split('=');
+                        
+                    }
+                }
+            }
+        }
+
 
         public static string GetMimeType(string extension)
         {

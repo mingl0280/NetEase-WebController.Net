@@ -4,28 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{91834612-BF24-4F8D-808F-9DC1457E91DF}</ProjectGuid>
+    <ProjectGuid>{C14131C4-A617-4BB3-8A16-1E78EB063684}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>NetEaseController</RootNamespace>
-    <AssemblyName>NetEaseController</AssemblyName>
+    <RootNamespace>NUCForeground</RootNamespace>
+    <AssemblyName>NUCForeground</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,16 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -68,48 +49,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GWL.cs" />
-    <Compile Include="MIMEMaps.cs" />
-    <Compile Include="MKs.cs" />
-    <Compile Include="Points.cs" />
-    <Compile Include="Properties\CommandSetting.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>CommandSetting.settings</DependentUpon>
-    </Compile>
+    <Compile Include="ClassNEMRepeatSearcher.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="KeyboardFlag.cs" />
-    <Compile Include="KeyboardHooker.cs" />
-    <Compile Include="NativeMethods.cs" />
+    <Compile Include="PreDefMouseOps.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SWPFlags.cs" />
-    <Compile Include="VirtualKeyCode.cs" />
-    <Compile Include="WindowPosTypes.cs" />
-    <Compile Include="WM.cs" />
-    <Compile Include="WndPoints.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.manifest" />
-    <None Include="Properties\CommandSetting.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>CommandSetting.Designer.cs</LastGenOutput>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -121,21 +84,85 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 和 x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
+    <None Include="Resources\AcceptPhone.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Exit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Hangup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Hibernate.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Lyric.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Next.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pause.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Play.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Power.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Prev.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VolDown.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VolUp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\WeChat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NEM.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetEaseController\NetEaseController.csproj">
+      <Project>{91834612-bf24-4f8d-808f-9dc1457e91df}</Project>
+      <Name>NetEaseController</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ListLoop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ListNoLoop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OneLoop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Random.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Lyric_Off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SAMP_ALLREP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SAMP_NOREP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SAMP_ONEREP.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SAMP_RND.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\windows.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

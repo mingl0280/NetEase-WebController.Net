@@ -12,7 +12,7 @@ namespace NetEaseController.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
     internal sealed partial class CommandSetting : global::System.Configuration.ApplicationSettingsBase {
         
         private static CommandSetting defaultInstance = ((CommandSetting)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new CommandSetting())));
@@ -92,6 +92,18 @@ namespace NetEaseController.Properties {
             }
             set {
                 this["LikeMusic"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("WIN")]
+        public string Win {
+            get {
+                return ((string)(this["Win"]));
+            }
+            set {
+                this["Win"] = value;
             }
         }
     }

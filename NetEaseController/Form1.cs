@@ -23,6 +23,13 @@ namespace NetEaseController
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
+        /*
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowText(IntPtr hwnd, );
+        */
+
         private Dictionary<string, List<VirtualKeyCode>> CommandDict = new Dictionary<string, List<VirtualKeyCode>>();
         private static int NEPid = 0;
         private static bool ProcRunning = true;
@@ -74,7 +81,7 @@ namespace NetEaseController
                 case "ALT":
                     return "MENU";
                 case "WIN":
-                    return "RWIN";
+                    return "LWIN";
                 default:
                     return "VK_" + input;
             }
@@ -133,7 +140,7 @@ namespace NetEaseController
             if (textBox1.Lines.Length > 200)
             {
                 var tList = textBox1.Lines.ToList();
-                tList.RemoveRange(CommandDict.Count - 1, 150+CommandDict.Count);
+                tList.RemoveRange(CommandDict.Count - 1, 150 + CommandDict.Count);
                 textBox1.Lines = tList.ToArray();
             }
 
@@ -176,7 +183,7 @@ namespace NetEaseController
                             string decodedPathString = "." + HttpUtility.UrlDecode(RelativeUrl).Replace(@"/", @"\");
                             if (!File.Exists(decodedPathString))
                             {
-                                hContext.Response.StatusCode = 400;
+                                hContext.Response.StatusCode = 404;
                                 hContext.Response.ContentEncoding = Encoding.UTF8;
                                 decodedPathString = "./error/404.htm";
                                 BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Failed. 404.", "Error" });
@@ -260,13 +267,81 @@ namespace NetEaseController
         }
 
         /// <summary>
+        /// 翻译命令到快捷键并执行（静态方法）
+        /// </summary>
+        /// <param name="Command">目标命令</param>
+        public static void ExecuteCmd(string Command)
+        {
+            new Form1().ExecuteNECommand(Command);
+        }
+
+        /// <summary>
         /// 翻译命令到快捷键并执行
         /// </summary>
         /// <param name="Command">目标命令</param>
-        private void ExecuteNECommand(string Command)
+        public void ExecuteNECommand(string Command)
         {
-            List<VirtualKeyCode> vks = new List<VirtualKeyCode>(CommandDict[Command]);
-            PressCommandKeys(vks);
+            try
+            {
+                string commandExecuteResult = "";
+                if (CommandDict.ContainsKey(Command))
+                {
+                    List<VirtualKeyCode> vks = new List<VirtualKeyCode>(CommandDict[Command]);
+                    PressCommandKeys(vks);
+                    commandExecuteResult = "Succeed.";
+                }
+                else
+                {
+                    switch (Command.ToLower())
+                    {
+                        case "restartnetease":
+                            try
+                            {
+                                Process[] neps = Process.GetProcessesByName("cloudmusic");
+                                foreach (Process nep in neps)
+                                {
+                                    try
+                                    {
+                                        nep.Kill();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (ex.GetType() != (new NotSupportedException()).GetType())
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            throw ex;
+                                        }
+                                    }
+                                }
+
+                                commandExecuteResult = "Succeed.";
+
+                            }
+                            catch (Exception e)
+                            {
+                                commandExecuteResult = "Failed. " + e.Message + "\r\n\r\n" + e.StackTrace;
+                            }
+                            break;
+                        case "restartme":
+                            BeginInvoke(new AddToTextLogD(AddToTextLog), "Restart Command Received. Restart.");
+                            Thread.Sleep(500);
+                            Application.Restart();
+                            break;
+                        default:
+                            commandExecuteResult = "Failed. Unknown Command.";
+                            break;
+                    }
+                }
+
+                BeginInvoke(new AddToTextLogD(AddToTextLog), string.Format("\t\tCommand {0} Execute {1}"), new string[] { Command, commandExecuteResult });
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         /// <summary>

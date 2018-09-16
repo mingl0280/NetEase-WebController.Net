@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetEaseController", "NetEaseController\NetEaseController.csproj", "{91834612-BF24-4F8D-808F-9DC1457E91DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUCForeground", "NUCForeground\NUCForeground.csproj", "{C14131C4-A617-4BB3-8A16-1E78EB063684}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{91834612-BF24-4F8D-808F-9DC1457E91DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91834612-BF24-4F8D-808F-9DC1457E91DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91834612-BF24-4F8D-808F-9DC1457E91DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C14131C4-A617-4BB3-8A16-1E78EB063684}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C14131C4-A617-4BB3-8A16-1E78EB063684}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C14131C4-A617-4BB3-8A16-1E78EB063684}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C14131C4-A617-4BB3-8A16-1E78EB063684}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,7 +11,7 @@ namespace NetEaseController
     /// Specifies various aspects of a keystroke. This member can be certain combinations of the following values.
     /// </summary>
     [Flags]
-    internal enum KeyboardFlag : uint // UInt32
+    public enum KeyboardFlag : uint // UInt32
     {
         /// <summary>
         /// KEYEVENTF_EXTENDEDKEY = 0x0001 (If specified, the scan code was preceded by a prefix byte that has the value 0xE0 (224).)

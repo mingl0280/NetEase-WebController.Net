@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NetEaseController" GeneratedClassName="CommandSetting">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NetEaseController.Properties" GeneratedClassName="CommandSetting">
   <Profiles />
   <Settings>
     <Setting Name="PlayPause" Type="System.String" Scope="User">
@@ -19,6 +19,9 @@
     </Setting>
     <Setting Name="LikeMusic" Type="System.String" Scope="User">
       <Value Profile="(Default)">Ctrl+F8</Value>
+    </Setting>
+    <Setting Name="Win" Type="System.String" Scope="User">
+      <Value Profile="(Default)">WIN</Value>
     </Setting>
   </Settings>
 </SettingsFile>

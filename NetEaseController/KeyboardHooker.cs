@@ -13,7 +13,7 @@ namespace NetEaseController
     /// <summary>
     /// Keyboard and mouse hooks, and send inputs.
     /// </summary>
-    class KeyboardAndMouseHooksAndMessages
+    public class KeyboardAndMouseHooksAndMessages
     {
         #region "Send Inputs"
 
@@ -21,7 +21,7 @@ namespace NetEaseController
         /// a single INPUT structure. See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms646270.aspx
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct Input
+        public struct Input
         {
             public Int32 type;
             public InputUnion data;
@@ -40,7 +40,7 @@ namespace NetEaseController
         /// 
         /// </summary>
         [StructLayout(LayoutKind.Explicit)]
-        internal struct InputUnion
+        public struct InputUnion
         {
             [FieldOffset(0)]
             public HardwareInput Hardware;
@@ -54,7 +54,7 @@ namespace NetEaseController
         /// Hardware input structure. See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms646269.aspx
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct HardwareInput
+        public struct HardwareInput
         {
             public uint Msg;
             public ushort ParamL;
@@ -65,7 +65,7 @@ namespace NetEaseController
         /// Keyboard input structure. See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms646271.aspx
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct KeyboardInput
+        public struct KeyboardInput
         {
             public ushort Vk;
             public ushort Scan;
@@ -78,7 +78,7 @@ namespace NetEaseController
         /// Mouse input structure. See:https://msdn.microsoft.com/en-us/library/windows/desktop/ms646273.aspx
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct MouseInput
+        public struct MouseInput
         {
             public int dx;
             public int dy;
