@@ -16,14 +16,6 @@ namespace NetEaseController
 {
     public class NativeMethods
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-
-        [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
-
-        public delegate IntPtr HookProc(int nCode, Int32 wParam, IntPtr lParam);
-
         [StructLayout(LayoutKind.Sequential)]
         public class Point
         {
@@ -39,7 +31,26 @@ namespace NetEaseController
             public int wHitTestCode;
             public int dwExtraInfo;
         }
-        
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        public static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
+
+        public delegate IntPtr HookProc(int nCode, Int32 wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll", EntryPoint = "LoadLibrary")]
+        public static extern int LoadLibrary(
+            [MarshalAs(UnmanagedType.LPStr)] string lpLibFileName);
+
+        [DllImport("kernel32.dll", EntryPoint = "GetProcAddress")]
+        public static extern IntPtr GetProcAddress(int hModule,
+            [MarshalAs(UnmanagedType.LPStr)] string lpProcName);
+
+        [DllImport("kernel32.dll", EntryPoint = "FreeLibrary")]
+        public static extern bool FreeLibrary(int hModule);
+
 
         /// <summary>
         /// https://msdn.microsoft.com/en-us/library/windows/desktop/ms644990.aspx

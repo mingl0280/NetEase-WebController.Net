@@ -82,7 +82,7 @@ namespace NUCForeground
             if (PlayingState == PlayState.Paused)
             {
                 PlayingState = PlayState.Playing;
-                btnPlayPause.BackgroundImage = Properties.Resources.Pause;
+                btnPlayPause.BackgroundImage = Pause;
             }
         }
 
@@ -195,12 +195,12 @@ namespace NUCForeground
             if (PlayingState == PlayState.Paused)
             {
                 PlayingState = PlayState.Playing;
-                btnPlayPause.BackgroundImage = Properties.Resources.Pause;
+                btnPlayPause.BackgroundImage = Pause;
             }
             else
             {
                 PlayingState = PlayState.Paused;
-                btnPlayPause.BackgroundImage = Properties.Resources.Play;
+                btnPlayPause.BackgroundImage = Play;
             }
         }
 
@@ -210,7 +210,7 @@ namespace NUCForeground
             if (PlayingState == PlayState.Paused)
             {
                 PlayingState = PlayState.Playing;
-                btnPlayPause.BackgroundImage = Properties.Resources.Pause;
+                btnPlayPause.BackgroundImage = Pause;
             }
         }
 
@@ -247,12 +247,12 @@ namespace NUCForeground
                 case RepState.ListNoLoop:
                     RepeatState = RepState.ListLoop;
                     SendNetEaseLeftClick(PreDefinedPoints[MO_Repeat]);
-                    btnLoop.BackgroundImage = Properties.Resources.ListLoop;
+                    btnLoop.BackgroundImage = ListLoop;
                     break;
                 case RepState.ListLoop:
                     RepeatState = RepState.OneLoop;
                     SendNetEaseLeftClick(PreDefinedPoints[MO_Repeat]);
-                    btnLoop.BackgroundImage = Properties.Resources.OneLoop;
+                    btnLoop.BackgroundImage = OneLoop;
                     break;
                 case RepState.OneLoop:
                     RepeatState = RepState.Random;
@@ -262,7 +262,7 @@ namespace NUCForeground
                 case RepState.Random:
                     RepeatState = RepState.ListNoLoop;
                     SendNetEaseLeftClick(PreDefinedPoints[MO_Repeat]);
-                    btnLoop.BackgroundImage = Properties.Resources.ListNoLoop;
+                    btnLoop.BackgroundImage = ListNoLoop;
                     break;
             }
         }
@@ -455,37 +455,6 @@ namespace NUCForeground
 
         private void GetNeteasePlayingState()
         {
-            //IntPtr TargetWindowHandle = GetNetEaseTargetWindow();
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    KeyPointColors[KeyPoints[i]] = GetPixelColor(TargetWindowHandle, KeyPoints[i]);
-            //}
-            //if (KeyPointColors[KeyPoints[0]].R == 0xf8 && KeyPointColors[KeyPoints[0]].G == KeyPointColors[KeyPoints[0]].B && KeyPointColors[KeyPoints[0]].B == 0xF6)
-            //{
-            //    RepeatState = RepState.ListLoop;
-            //    btnLoop.BackgroundImage = Properties.Resources.ListLoop;
-            //}
-            //else
-            //{
-            //    if (KeyPointColors[KeyPoints[1]].R == 0xf8 && KeyPointColors[KeyPoints[1]].G == KeyPointColors[KeyPoints[1]].B && KeyPointColors[KeyPoints[1]].B == 0xF6)
-            //    {
-            //        RepeatState = RepState.Random;
-            //        btnLoop.BackgroundImage = Properties.Resources.Random;
-            //    }
-            //    else
-            //    {
-            //        if (KeyPointColors[KeyPoints[2]].R == 0xf8 && KeyPointColors[KeyPoints[2]].G == KeyPointColors[KeyPoints[2]].B && KeyPointColors[KeyPoints[2]].B == 0xF6)
-            //        {
-            //            RepeatState = RepState.ListNoLoop;
-            //            btnLoop.BackgroundImage = Properties.Resources.ListNoLoop;
-            //        }
-            //        else
-            //        {
-            //            RepeatState = RepState.OneLoop;
-            //            btnLoop.BackgroundImage = Properties.Resources.OneLoop;
-            //        }
-            //    }
-            //}
             Retry:
             RepeatState = DoImageCompare();
             if (RepeatState != RepState.Unknown)
@@ -493,13 +462,13 @@ namespace NUCForeground
                 switch(RepeatState)
                 {
                     case RepState.ListLoop:
-                        btnLoop.BackgroundImage = Properties.Resources.ListLoop;
+                        btnLoop.BackgroundImage = ListLoop;
                         break;
                     case RepState.ListNoLoop:
-                        btnLoop.BackgroundImage = Properties.Resources.ListNoLoop;
+                        btnLoop.BackgroundImage = ListNoLoop;
                         break;
                     case RepState.OneLoop:
-                        btnLoop.BackgroundImage = Properties.Resources.OneLoop;
+                        btnLoop.BackgroundImage = OneLoop;
                         break;
                     case RepState.Random:
                         btnLoop.BackgroundImage = Properties.Resources.Random;

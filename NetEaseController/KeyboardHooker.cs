@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using NetEaseController;
 
 namespace NetEaseController
@@ -293,17 +294,33 @@ namespace NetEaseController
 
         public static void SimulateKeyDown(VirtualKeyCode vk)
         {
-            Input i = new Input { type = INPUT_KEYBOARD };
+            try
+            {
+                Input i = new Input { type = INPUT_KEYBOARD };
             i.data.Keyboard = new KeyboardInput { Vk = (ushort)vk, Scan = 0, Flags = 0 };
             Input[] inputs = new Input[] { i };
-            NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(new Input()));
+            
+                NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(new Input()));
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
         public static void SimulateKeyUp(VirtualKeyCode vk)
         {
-            Input i = new Input { type = INPUT_KEYBOARD };
+            try
+            {
+                Input i = new Input { type = INPUT_KEYBOARD };
             i.data.Keyboard = new KeyboardInput { Vk = (ushort)vk, Scan = 0, Flags = (uint)KeyboardFlag.KeyUp };
             Input[] inputs = new Input[] { i };
-            NativeMethods.SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(new Input()));
+            
+                NativeMethods.SendInput((uint) inputs.Length, inputs, Marshal.SizeOf(new Input()));
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         public static void SimulateKeyPress(VirtualKeyCode vk)

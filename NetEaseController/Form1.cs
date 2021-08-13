@@ -1,20 +1,18 @@
-﻿using NetEaseController;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Resources;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
 using System.Web;
+using System.Windows.Forms;
+using NetEaseController.Properties;
 
 namespace NetEaseController
 {
@@ -31,10 +29,11 @@ namespace NetEaseController
         */
 
         private Dictionary<string, List<VirtualKeyCode>> CommandDict = new Dictionary<string, List<VirtualKeyCode>>();
-        private static int NEPid = 0;
+        private static IntPtr NEPid = IntPtr.Zero;
         private static bool ProcRunning = true;
         private static Thread MusicTitleThread, ControllerListenerThread;
         private static string MusicTitleString = "";
+        private readonly Process CurrentProcess = Process.GetCurrentProcess();
 
         private delegate void AddToTextLogD(string text, string severity);
 
@@ -42,6 +41,7 @@ namespace NetEaseController
         {
             InitializeComponent();
             LoadCommandKeySeettings();
+            LoadActionsMap();
         }
 
         /// <summary>
@@ -49,20 +49,164 @@ namespace NetEaseController
         /// </summary>
         private void LoadCommandKeySeettings()
         {
-            foreach (SettingsProperty SettingProp in Properties.CommandSetting.Default.Properties)
+            foreach (SettingsProperty setting_prop in CommandSetting.Default.Properties)
             {
-                List<VirtualKeyCode> currentVKList = new List<VirtualKeyCode>();
-                string CVKString = (string)SettingProp.DefaultValue;
-                textBox1.AppendText(SettingProp.Name + " = " + (string)SettingProp.DefaultValue + "\r\n");
-                string[] CVKStrings = CVKString.Split('+');
-                foreach (string CVK in CVKStrings)
+                List<VirtualKeyCode> current_vk_list = new List<VirtualKeyCode>();
+                string cvk_string = (string)setting_prop.DefaultValue;
+                textBox1.AppendText(setting_prop.Name + " = " + (string)setting_prop.DefaultValue + "\r\n");
+                string[] cvk_strings = cvk_string.Split('+');
+                foreach (string cvk in cvk_strings)
                 {
-                    string VKStr = CVK.Trim().ToUpper();
-                    VKStr = GetProperVKString(VKStr);
-                    currentVKList.Add((VirtualKeyCode)Enum.Parse(typeof(VirtualKeyCode), VKStr));
+                    string vk_str = cvk.Trim().ToUpper();
+                    vk_str = GetProperVKString(vk_str);
+                    current_vk_list.Add((VirtualKeyCode)Enum.Parse(typeof(VirtualKeyCode), vk_str));
                 }
-                CommandDict.Add(SettingProp.Name, currentVKList);
+                CommandDict.Add(setting_prop.Name, current_vk_list);
             }
+        }
+
+        private VBOPs VBOps = new VBOPs();
+        private readonly ComponentResourceManager _Res = new ComponentResourceManager(typeof(Form1));
+
+        private string SetNEPath()
+        {
+           
+
+            string NEPath;
+            var CfgFile = File.CreateText("config.txt");
+            while (true)
+            {
+                OpenFileDialog Ofd = new OpenFileDialog
+                {
+                    FileName = "CloudMusic.exe",
+                    CheckFileExists = true,
+                    Multiselect = false,
+                    Filter = _Res.GetString("NEFilterStr"),
+                };
+                Ofd.ShowDialog();
+                NEPath = Ofd.FileName;
+                if (!string.IsNullOrWhiteSpace(NEPath))
+                {
+                    CfgFile.WriteLine($"Exec={NEPath}");
+                    CfgFile.Flush();
+                    CfgFile.Close();
+                    break;
+                }
+            }
+            return NEPath;
+        }
+
+        /// <summary>
+        /// 载入动作列表
+        /// </summary>
+        private void LoadActionsMap()
+        {
+            string NEPath = "";
+            if (!File.Exists("config.txt"))
+            {
+                NEPath = SetNEPath();
+            }
+            else
+            {
+                using (StreamReader Sr = new StreamReader("config.txt"))
+                {
+                    var LineText = Sr.ReadLine();
+                    string Arg = "", Value = "";
+                    bool ValueRange = false;
+                    if (LineText != null)
+                    {
+                        foreach (var T in LineText)
+                        {
+                            if (T == '=' && !ValueRange)
+                            {
+                                ValueRange = true;
+                                continue;
+                            }
+
+                            if (!ValueRange)
+                            {
+                                Arg += T;
+                            }
+                            else
+                            {
+                                Value += T;
+                            }
+                        }
+
+                        if (Arg == "Exec")
+                        {
+                            NEPath = Value;
+                        }
+                    }
+                    else
+                    {
+                        NEPath = SetNEPath();
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(NEPath))
+                {
+                    NEPath = SetNEPath();
+                }
+            }
+            textBox1.AppendText(_Res.GetString("NEName") + _Res.GetString("PathTranslate") + _Res.GetString("CommaSymbol") + NEPath + "\r\n");
+            //VBOps.Initialize();
+            FunctionsMap.Add("restartnetease", () =>
+            {
+                try
+                {
+                    Process[] neps = Process.GetProcessesByName("cloudmusic");
+                    foreach (Process nep in neps)
+                    {
+                        try
+                        {
+                            nep.Kill();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex.GetType() != (new NotSupportedException()).GetType())
+                            {
+                                continue;
+                            }
+
+                            throw ex;
+                        }
+                    }
+
+                    Process NewProc = new Process
+                    {
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            Arguments = "",
+                            FileName = NEPath,
+                            CreateNoWindow = false,
+                            WorkingDirectory = new FileInfo(NEPath).DirectoryName ?? string.Empty,
+                        }
+                    };
+                    NewProc.Start();
+                    return "Succeed.";
+                }
+                catch (Exception e)
+                {
+                    return "Failed. " + e.Message + "\r\n\r\n" + e.StackTrace;
+                }
+            });
+            FunctionsMap.Add("restartme", () =>
+            {
+                BeginInvoke(new AddToTextLogD(AddToTextLog), "Restart Command Received. Restart.", "Info");
+                Thread.Sleep(500);
+                Process NewProc = new Process()
+                {
+                    StartInfo = new ProcessStartInfo(Application.ExecutablePath)
+                };
+                NewProc.Start();
+                Environment.Exit(0);
+                return "OK";
+            });
+            FunctionsMap.Add("AddVBVoice", () =>
+            {
+                return "";
+            });
         }
 
         /// <summary>
@@ -92,17 +236,25 @@ namespace NetEaseController
         /// </summary>
         private void MusicTitleUpdater()
         {
+            StringBuilder title_builder = new StringBuilder(2053);
             while (ProcRunning)
             {
-                if (NEPid != 0)
+                if (NEPid != IntPtr.Zero)
                 {
                     try
                     {
-                        MusicTitleString = Process.GetProcessById(NEPid).MainWindowTitle;
+                        title_builder.Clear();
+                        NativeMethods.GetWindowText(NEPid, title_builder, 2053);
+                        MusicTitleString = title_builder.ToString();
+                        if (string.IsNullOrWhiteSpace(MusicTitleString))
+                        {
+                            NEPid = IntPtr.Zero;
+                        }
+                        //MusicTitleString = Process.GetProcessById(NEPid).MainWindowTitle;
                     }
                     catch (Exception e)
                     {
-                        NEPid = 0;
+                        NEPid = IntPtr.Zero;
                         Debug.WriteLine(e.Message);
                     }
                 }
@@ -111,15 +263,27 @@ namespace NetEaseController
                     try
                     {
                         Process[] neps = Process.GetProcessesByName("cloudmusic");
-                        foreach (Process proc in neps)
+                        var pids = neps.Select(process => process.Id).ToList();
+                        NativeMethods.EnumWindows((hwnd, param) =>
                         {
-                            var CNText = new StringBuilder("", 2053);
-                            GetClassName(proc.MainWindowHandle, CNText, 2050);
-                            if (CNText.ToString().Trim() != "" && CNText.ToString() != "DesktopLyrics")
+                            title_builder.Clear();   
+                            NativeMethods.GetWindowText(hwnd, title_builder, 2053);
+                            int ckpid = 0;
+                            NativeMethods.GetWindowThreadProcessId(hwnd, out ckpid);
+                            if (pids.Contains(ckpid))
                             {
-                                NEPid = proc.Id;
+                                if (!string.IsNullOrWhiteSpace(title_builder.ToString()))
+                                {
+                                    if (title_builder.ToString().Contains("-"))
+                                    {
+                                        NEPid = hwnd;
+                                        return false;
+                                    }
+                                }
                             }
-                        }
+
+                            return true;
+                        }, 0);
                     }
                     catch (Exception e)
                     {
@@ -144,11 +308,8 @@ namespace NetEaseController
                 textBox1.Lines = tList.ToArray();
             }
 
-            textBox1.AppendText(string.Format("[{0} {1}][{2}]{3}\r\n", new string[]{
-                DateTime.Now.ToLongDateString(),
-                DateTime.Now.ToLongTimeString(),
-                severity,
-                text}));
+            textBox1.AppendText(
+                $"[{DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}][{severity}]{text}\r\n");
         }
 
         /// <summary>
@@ -161,20 +322,19 @@ namespace NetEaseController
                 hListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
                 hListener.Prefixes.Add("http://*:10180/");
                 hListener.Start();
+                BeginInvoke(new AddToTextLogD(AddToTextLog),
+                    _Res.GetString("ServerListeningText") + _Res.GetString("CommaSymbol") + "http://*:10180/", "Info");
                 while (ProcRunning)
                 {
-                    HttpListenerContext hContext = hListener.GetContext();
-                    string RelativeUrl = hContext.Request.RawUrl;
+                    HttpListenerContext HContext = hListener.GetContext();
+                    string RelativeUrl = HContext.Request.RawUrl;
                     if (RelativeUrl == "/")
                     {
-                        hContext.Response.StatusCode = 200;
-                        hContext.Response.ContentEncoding = Encoding.UTF8;
-                        BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { string.Format("{0}:{1} Query to {2} Succeed. 200.",
-                            new string[] {
-                                hContext.Request.RemoteEndPoint.Address.ToString(),
-                                hContext.Request.RemoteEndPoint.Port.ToString(),
-                                hContext.Request.RawUrl })  , "Info" });
-                        SendResponse("./html/index.htm", ref hContext);
+                        HContext.Response.StatusCode = 200;
+                        HContext.Response.ContentEncoding = Encoding.UTF8;
+                        BeginInvoke(new AddToTextLogD(AddToTextLog),
+                            $"{HContext.Request.RemoteEndPoint?.Address}:{HContext.Request.RemoteEndPoint?.Port.ToString()} Query to {HContext.Request.RawUrl} Succeed. 200.", "Info");
+                        SendResponse("./html/index.htm", ref HContext);
                     }
                     else
                     {
@@ -183,33 +343,33 @@ namespace NetEaseController
                             string decodedPathString = "." + HttpUtility.UrlDecode(RelativeUrl).Replace(@"/", @"\");
                             if (!File.Exists(decodedPathString))
                             {
-                                hContext.Response.StatusCode = 404;
-                                hContext.Response.ContentEncoding = Encoding.UTF8;
+                                HContext.Response.StatusCode = 404;
+                                HContext.Response.ContentEncoding = Encoding.UTF8;
                                 decodedPathString = "./error/404.htm";
-                                BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Failed. 404.", "Error" });
-                                SendResponse(decodedPathString, ref hContext);
+                                BeginInvoke(new AddToTextLogD(AddToTextLog), "Query to " + HContext.Request.RawUrl + " Failed. 404.", "Error");
+                                SendResponse(decodedPathString, ref HContext);
                             }
                             else
                             {
-                                hContext.Response.StatusCode = 200;
-                                hContext.Response.ContentEncoding = Encoding.UTF8;
-                                BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
-                                SendResponse(decodedPathString, ref hContext);
+                                HContext.Response.StatusCode = 200;
+                                HContext.Response.ContentEncoding = Encoding.UTF8;
+                                //BeginInvoke(new AddToTextLogD(AddToTextLog), "Query to " + HContext.Request.RawUrl + " Succeed. 200.", "Info");
+                                SendResponse(decodedPathString, ref HContext);
                             }
                         }
                         else
                         {
-                            string opString = new StreamReader(hContext.Request.InputStream).ReadToEnd();
+                            string opString = new StreamReader(HContext.Request.InputStream).ReadToEnd();
                             if (opString == "Status")
                             {
-                                BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
-                                SendPlainTextResponse(@"正在播放: " + MusicTitleString, ref hContext);
+                                //BeginInvoke(new AddToTextLogD(AddToTextLog), "Query to " + HContext.Request.RawUrl + " Succeed. 200.", "Info");
+                                SendPlainTextResponse(@"正在播放: " + MusicTitleString, ref HContext);
                             }
                             else
                             {
                                 ExecuteNECommand(opString);
-                                BeginInvoke(new AddToTextLogD(AddToTextLog), new string[] { "Query to " + hContext.Request.RawUrl + " Succeed. 200.", "Info" });
-                                SendPlainTextResponse("OK", ref hContext);
+                                //BeginInvoke(new AddToTextLogD(AddToTextLog), "Query to " + HContext.Request.RawUrl + " Succeed. 200.", "Info");
+                                SendPlainTextResponse("OK", ref HContext);
                             }
                         }
                     }
@@ -226,14 +386,23 @@ namespace NetEaseController
         {
             FileInfo fi = new FileInfo(RealFilePath);
             hContext.Response.ContentType = MIMEMaps.GetMimeType(fi.Extension);
-            using (StreamWriter pageWriter = new StreamWriter(hContext.Response.OutputStream))
+            try
             {
-                using (StreamReader pReader = new StreamReader(RealFilePath))
+                using (StreamWriter pageWriter = new StreamWriter(hContext.Response.OutputStream))
                 {
-                    pageWriter.Write(pReader.ReadToEnd());
+                    using (StreamReader pReader = new StreamReader(RealFilePath))
+                    {
+                        pageWriter.Write(pReader.ReadToEnd());
+                    }
+
+                    pageWriter.Close();
                 }
-                pageWriter.Close();
             }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             hContext.Response.Close();
         }
 
@@ -260,9 +429,9 @@ namespace NetEaseController
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
-            MusicTitleThread = new Thread(new ThreadStart(MusicTitleUpdater));
+            MusicTitleThread = new Thread(MusicTitleUpdater);
             MusicTitleThread.Start();
-            ControllerListenerThread = new Thread(new ThreadStart(ControlListener));
+            ControllerListenerThread = new Thread(ControlListener);
             ControllerListenerThread.Start();
         }
 
@@ -275,68 +444,37 @@ namespace NetEaseController
             new Form1().ExecuteNECommand(Command);
         }
 
+        private Dictionary<string, Func<string>> FunctionsMap = new Dictionary<string, Func<string>>();
+
+
         /// <summary>
         /// 翻译命令到快捷键并执行
         /// </summary>
-        /// <param name="Command">目标命令</param>
-        public void ExecuteNECommand(string Command)
+        /// <param name="command">目标命令</param>
+        public void ExecuteNECommand(string command)
         {
             try
             {
-                string commandExecuteResult = "";
-                if (CommandDict.ContainsKey(Command))
+                string command_execute_result = "";
+                if (CommandDict.ContainsKey(command))
                 {
-                    List<VirtualKeyCode> vks = new List<VirtualKeyCode>(CommandDict[Command]);
+                    List<VirtualKeyCode> vks = new List<VirtualKeyCode>(CommandDict[command]);
                     PressCommandKeys(vks);
-                    commandExecuteResult = "Succeed.";
+                    command_execute_result = "Succeed.";
                 }
                 else
                 {
-                    switch (Command.ToLower())
+                    if (FunctionsMap.ContainsKey(command.ToLower()))
                     {
-                        case "restartnetease":
-                            try
-                            {
-                                Process[] neps = Process.GetProcessesByName("cloudmusic");
-                                foreach (Process nep in neps)
-                                {
-                                    try
-                                    {
-                                        nep.Kill();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        if (ex.GetType() != (new NotSupportedException()).GetType())
-                                        {
-                                            continue;
-                                        }
-                                        else
-                                        {
-                                            throw ex;
-                                        }
-                                    }
-                                }
-
-                                commandExecuteResult = "Succeed.";
-
-                            }
-                            catch (Exception e)
-                            {
-                                commandExecuteResult = "Failed. " + e.Message + "\r\n\r\n" + e.StackTrace;
-                            }
-                            break;
-                        case "restartme":
-                            BeginInvoke(new AddToTextLogD(AddToTextLog), "Restart Command Received. Restart.");
-                            Thread.Sleep(500);
-                            Application.Restart();
-                            break;
-                        default:
-                            commandExecuteResult = "Failed. Unknown Command.";
-                            break;
+                        command_execute_result = FunctionsMap[command.ToLower()]();
+                    }
+                    else
+                    {
+                        command_execute_result = "Failed. Unknown Command.";
                     }
                 }
 
-                BeginInvoke(new AddToTextLogD(AddToTextLog), string.Format("\t\tCommand {0} Execute {1}"), new string[] { Command, commandExecuteResult });
+                BeginInvoke(new AddToTextLogD(AddToTextLog), $"\t\tCommand {command} Execute {command_execute_result}", "Info");
             }
             catch (Exception)
             {
@@ -368,11 +506,11 @@ namespace NetEaseController
             }
             else
             {
-                VirtualKeyCode vkThis = vks.First();
+                VirtualKeyCode vk_this = vks.First();
                 vks.RemoveAt(0);
-                KeyboardAndMouseHooksAndMessages.SimulateKeyDown(vkThis);
+                KeyboardAndMouseHooksAndMessages.SimulateKeyDown(vk_this);
                 PressCommandKeys(vks);
-                KeyboardAndMouseHooksAndMessages.SimulateKeyUp(vkThis);
+                KeyboardAndMouseHooksAndMessages.SimulateKeyUp(vk_this);
             }
         }
     }
