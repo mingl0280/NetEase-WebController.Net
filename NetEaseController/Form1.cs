@@ -313,10 +313,10 @@ namespace NetEaseController
             using (HttpListener HListener = new HttpListener())
             {
                 HListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-                HListener.Prefixes.Add("http://*:10180/");
+                HListener.Prefixes.Add(Settings.Default.ServerAddress);
                 HListener.Start();
                 BeginInvoke(new AddToTextLogD(AddToTextLog),
-                    _Res.GetString("ServerListeningText") + _Res.GetString("CommaSymbol") + "http://*:10180/", "Info");
+                    _Res.GetString("ServerListeningText") + _Res.GetString("CommaSymbol") + Settings.Default.ServerAddress, "Info");
                 while (ProcRunning)
                 {
                     HttpListenerContext HContext = HListener.GetContext();
