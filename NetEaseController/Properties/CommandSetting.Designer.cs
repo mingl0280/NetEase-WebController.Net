@@ -154,17 +154,5 @@ namespace NetEaseController.Properties {
                 this["VB_VolDown"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://*:10180/")]
-        public string ServerAddress {
-            get {
-                return ((string)(this["ServerAddress"]));
-            }
-            set {
-                this["ServerAddress"] = value;
-            }
-        }
     }
 }

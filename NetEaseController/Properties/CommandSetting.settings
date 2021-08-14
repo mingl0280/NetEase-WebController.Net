@@ -35,8 +35,5 @@
     <Setting Name="VB_VolDown" Type="System.String" Scope="User">
       <Value Profile="(Default)">VOLUME_DOWN</Value>
     </Setting>
-    <Setting Name="ServerAddress" Type="System.String" Scope="User">
-      <Value Profile="(Default)">http://*:10180/</Value>
-    </Setting>
   </Settings>
 </SettingsFile>
