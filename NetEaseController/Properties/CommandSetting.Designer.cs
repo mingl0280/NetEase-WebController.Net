@@ -12,7 +12,7 @@ namespace NetEaseController.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class CommandSetting : global::System.Configuration.ApplicationSettingsBase {
         
         private static CommandSetting defaultInstance = ((CommandSetting)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new CommandSetting())));
@@ -104,6 +104,54 @@ namespace NetEaseController.Properties {
             }
             set {
                 this["Win"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("VOLUME_MUTE")]
+        public string VB_Mute {
+            get {
+                return ((string)(this["VB_Mute"]));
+            }
+            set {
+                this["VB_Mute"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ctrl+MEDIA_STOP")]
+        public string VB_OutToggle {
+            get {
+                return ((string)(this["VB_OutToggle"]));
+            }
+            set {
+                this["VB_OutToggle"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("VOLUME_UP")]
+        public string VB_VolUp {
+            get {
+                return ((string)(this["VB_VolUp"]));
+            }
+            set {
+                this["VB_VolUp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("VOLUME_DOWN")]
+        public string VB_VolDown {
+            get {
+                return ((string)(this["VB_VolDown"]));
+            }
+            set {
+                this["VB_VolDown"] = value;
             }
         }
     }

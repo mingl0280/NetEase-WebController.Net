@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>网易云音乐切换</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+    <style>
+        .title{
+            text-align: center;
+        }
+        .btn-list > button{
+			min-height: 2em;
+			line-height: 2em;
+			margin-left: 1.5em;
+            margin-right: 1.5em;
+			margin-top: 5px;
+			min-width: 12em;
+        }
+		#NowPlaying{
+		    text-align: center;
+            height: 2em;
+            overflow-y: auto;
+            overflow-x: hidden;
+		}
+    </style>
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js" ></script>
+    <script type="text/javascript" src="/static/js/jquery-ui.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="col-md-12">
+        <div class="col-md-12 title">
+            <h3>网易云遥控板</h3>
+        </div>
+        <div class="col-md-12" id="NowPlaying">
+
+        </div>
+        <div class="col-md-12 btn-list">
+            <button class="btn btn-lg btn-primary col-md-3" type="button" onclick="doOperationPostBack('PrevSong')">前一首</button>
+            <button class="btn btn-lg btn-primary col-md-3" type="button" onclick="doOperationPostBack('PlayPause')">暂停/播放</button>
+            <button class="btn btn-lg btn-primary col-md-3" type="button" onclick="doOperationPostBack('NextSong')">下一首</button>
+        </div>
+        <div class="col-md-12 btn-list">
+            <button class="btn btn-lg btn-warning col-md-3" type="button" onclick="doOperationPostBack('VolDown')">音量-</button>
+            <!--a class="btn btn-lg btn-danger col-md-4" role="button" href="?action=shutdown">关机</a-->
+            <button class="btn btn-lg btn-warning col-md-3" type="button" onclick="doOperationPostBack('VolUp')">音量+</button>
+            <button class="btn btn-lg btn-success col-md-3" type="button" onclick="doOperationPostBack('LikeMusic')">喜欢</button>
+        </div>
+        <div class="col-md-12 btn-list">
+            <button class="btn btn-lg btn-info col-md-3" type="button" onclick="doOperationPostBack('VB_VolDown')">VoiceMeeter音量-</button>
+            <button class="btn btn-lg btn-info col-md-3" type="button" onclick="doOperationPostBack('VB_VolUp')">VoiceMeeter音量+</button>
+            <button class="btn btn-lg btn-info col-md-3" type="button" onclick="doOperationPostBack('VB_Mute')">VoiceMeeter静音</button>
+        </div>
+        <div class="col-md-12 btn-list">
+            <button class="btn btn-lg btn-info col-md-3" type="button" onclick="doOperationPostBack('VB_OutToggle')">VoiceMeeter切换输出设备</button>
+            <button class="btn btn-lg btn-danger col-md-3" type="button" onclick="doOperationPostBack('RestartNetease')">网易云重启</button>
+            <!--a class="btn btn-lg btn-danger col-md-4" role="button" href="?action=shutdown">关机</a-->
+            <button class="btn btn-lg btn-danger col-md-3" type="button" onclick="doOperationPostBack('RestartMe')">服务器端重启</button>
+            <!--button class="btn btn-lg btn-success col-md-4" type="button" onclick="doOperationPostBack('')">喜欢</button-->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script lang="javascript">
+    function doOperationPostBack(OpCode)
+    {
+        $.post('/Operation', OpCode, function (msg) {
+            UpdateFunc();
+        });
+    }
+    var iUpdate = setInterval(UpdateFunc, 1000);
+	function UpdateFunc() {
+        $.post('/Operation', 'Status', function (msg) {
+            $('#NowPlaying')[0].textContent = msg;
+        });
+    }
+</script>
