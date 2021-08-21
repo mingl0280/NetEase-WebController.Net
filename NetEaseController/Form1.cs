@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Resources;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Web;
 using System.Windows.Forms;
-using NetEaseController.Properties;
 
 namespace NetEaseController
 {
@@ -49,11 +46,12 @@ namespace NetEaseController
         /// </summary>
         private void LoadCommandKeySeettings()
         {
-            foreach (SettingsProperty SettingProp in CommandSetting.Default.Properties)
+            KeyConfigs KeysCfg = new KeyConfigs();
+            foreach (var SettingProp in KeysCfg.Properties)
             {
                 List<VirtualKeyCode> CurrentVkList = new List<VirtualKeyCode>();
-                string CvkString = (string)SettingProp.DefaultValue;
-                textBox1.AppendText(SettingProp.Name + " = " + (string)SettingProp.DefaultValue + "\r\n");
+                string CvkString = (string)KeysCfg[SettingProp];
+                textBox1.AppendText(SettingProp + " = " + (string)KeysCfg[SettingProp] + "\r\n");
                 string[] CvkStrings = CvkString.Split('+');
                 foreach (string Cvk in CvkStrings)
                 {
@@ -61,19 +59,15 @@ namespace NetEaseController
                     VkStr = GetProperVKString(VkStr);
                     CurrentVkList.Add((VirtualKeyCode)Enum.Parse(typeof(VirtualKeyCode), VkStr));
                 }
-                CommandDict.Add(SettingProp.Name, CurrentVkList);
+                CommandDict.Add(SettingProp, CurrentVkList);
             }
         }
 
         private VBOPs _VbOps = new VBOPs();
         private readonly ComponentResourceManager _Res = new ComponentResourceManager(typeof(Form1));
 
-        private string SetNePath()
+        private void SetNePath()
         {
-           
-
-            string NEPath;
-            var CfgFile = File.CreateText("config.txt");
             while (true)
             {
                 OpenFileDialog Ofd = new OpenFileDialog
@@ -84,16 +78,12 @@ namespace NetEaseController
                     Filter = _Res.GetString("NEFilterStr"),
                 };
                 Ofd.ShowDialog();
-                NEPath = Ofd.FileName;
-                if (!string.IsNullOrWhiteSpace(NEPath))
+                NetEaseConfig.NePath = Ofd.FileName;
+                if (!string.IsNullOrWhiteSpace(NetEaseConfig.NePath))
                 {
-                    CfgFile.WriteLine($"Exec={NEPath}");
-                    CfgFile.Flush();
-                    CfgFile.Close();
                     break;
                 }
             }
-            return NEPath;
         }
 
         /// <summary>
@@ -101,55 +91,11 @@ namespace NetEaseController
         /// </summary>
         private void LoadActionsMap()
         {
-            string NEPath = "";
-            if (!File.Exists("config.txt"))
+            if (string.IsNullOrWhiteSpace(NetEaseConfig.NePath))
             {
-                NEPath = SetNePath();
+                SetNePath();
             }
-            else
-            {
-                using (StreamReader Sr = new StreamReader("config.txt"))
-                {
-                    var LineText = Sr.ReadLine();
-                    string Arg = "", Value = "";
-                    bool ValueRange = false;
-                    if (LineText != null)
-                    {
-                        foreach (var T in LineText)
-                        {
-                            if (T == '=' && !ValueRange)
-                            {
-                                ValueRange = true;
-                                continue;
-                            }
-
-                            if (!ValueRange)
-                            {
-                                Arg += T;
-                            }
-                            else
-                            {
-                                Value += T;
-                            }
-                        }
-
-                        if (Arg == "Exec")
-                        {
-                            NEPath = Value;
-                        }
-                    }
-                    else
-                    {
-                        NEPath = SetNePath();
-                    }
-                }
-
-                if (string.IsNullOrWhiteSpace(NEPath))
-                {
-                    NEPath = SetNePath();
-                }
-            }
-            textBox1.AppendText(_Res.GetString("NEName") + _Res.GetString("PathTranslate") + _Res.GetString("CommaSymbol") + NEPath + "\r\n");
+            textBox1.AppendText(_Res.GetString("NEName") + _Res.GetString("PathTranslate") + _Res.GetString("CommaSymbol") + NetEaseConfig.NePath + "\r\n");
             //VBOps.Initialize();
             _FunctionsMap.Add("restartnetease", () =>
             {
@@ -178,9 +124,9 @@ namespace NetEaseController
                         StartInfo = new ProcessStartInfo()
                         {
                             Arguments = "",
-                            FileName = NEPath,
+                            FileName = NetEaseConfig.NePath,
                             CreateNoWindow = false,
-                            WorkingDirectory = new FileInfo(NEPath).DirectoryName ?? string.Empty,
+                            WorkingDirectory = new FileInfo(NetEaseConfig.NePath).DirectoryName ?? string.Empty,
                         }
                     };
                     NewProc.Start();
@@ -222,6 +168,8 @@ namespace NetEaseController
                 return input;
             switch (input)
             {
+                case "SHIFT":
+                    return "SHIFT";
                 case "CTRL":
                     return "CONTROL";
                 case "ALT":
@@ -268,7 +216,7 @@ namespace NetEaseController
                         var Pids = Neps.Select(Process => Process.Id).ToList();
                         NativeMethods.EnumWindows((Hwnd, Param) =>
                         {
-                            TitleBuilder.Clear();   
+                            TitleBuilder.Clear();
                             NativeMethods.GetWindowText(Hwnd, TitleBuilder, 2053);
                             NativeMethods.GetWindowThreadProcessId(Hwnd, out int CkPid);
                             if (!Pids.Contains(CkPid) || string.IsNullOrWhiteSpace(TitleBuilder.ToString()) ||
@@ -313,10 +261,10 @@ namespace NetEaseController
             using (HttpListener HListener = new HttpListener())
             {
                 HListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
-                HListener.Prefixes.Add(Settings.Default.ServerAddress);
+                HListener.Prefixes.Add(ServerConfigs.ServerAddress);
                 HListener.Start();
                 BeginInvoke(new AddToTextLogD(AddToTextLog),
-                    _Res.GetString("ServerListeningText") + _Res.GetString("CommaSymbol") + Settings.Default.ServerAddress, "Info");
+                    _Res.GetString("ServerListeningText") + _Res.GetString("CommaSymbol") + ServerConfigs.ServerAddress, "Info");
                 while (ProcRunning)
                 {
                     HttpListenerContext HContext = HListener.GetContext();
